@@ -3,6 +3,7 @@ from django.db import models
 
 # Create your models here.
 
+# Create Teacher model
 class Teacher(models.Model):
     TeacherID = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=20)
@@ -12,7 +13,7 @@ class Teacher(models.Model):
         (1, "1"),
     )
     gender = models.CharField(max_length=1, choices=gender_choice)
-    age = models.IntegerField
+    age = models.IntegerField()
     teac_image = models.ImageField(upload_to="teacherImage", blank=True)
 
     def __str__(self):
@@ -24,6 +25,7 @@ class Teacher(models.Model):
         db_table = 'd_teacher'
 
 
+# Create Course model
 class Course(models.Model):
     CourseID = models.CharField(max_length=20)
     course_name = models.CharField(max_length=100)
@@ -48,6 +50,7 @@ class Course(models.Model):
         db_table = "d_course"
 
 
+# Create Student model
 class Student(models.Model):
     StudentID = models.CharField(max_length=8)
     name = models.CharField(max_length=20)
@@ -70,6 +73,7 @@ class Student(models.Model):
         db_table = "d_student"
 
 
+# Create Enrollment model
 class Enrollment(models.Model):
     ID = models.IntegerField(primary_key=True)
     StudentID = models.ForeignKey(Student, on_delete=models.CASCADE)

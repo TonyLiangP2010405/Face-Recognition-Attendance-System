@@ -4,6 +4,7 @@ from users.models import Student, Course
 
 
 # Create your models here.
+# Create AttendanceReport model
 class AttendanceReport(models.Model):
     AttendanceID = models.IntegerField(primary_key=True)
     status_choice =(
@@ -24,6 +25,7 @@ class AttendanceReport(models.Model):
         db_table = "d_attendance"
 
 
+# Create StudentAttendance model
 class StudentAttendance(models.Model):
     Sta_ID = models.IntegerField(primary_key=True)
     StudentID = models.ForeignKey(Student, on_delete=models.CASCADE)
