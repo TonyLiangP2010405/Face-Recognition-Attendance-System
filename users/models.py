@@ -1,20 +1,26 @@
 from django.db import models
-
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
+
+
+# Create AbstractUser model
+class MyUser(AbstractUser):
+    ID = models.IntegerField(primary_key=True)
+
 
 # Create Teacher model
 class Teacher(models.Model):
     TeacherID = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=20)
     teac_email = models.CharField(max_length=100)
     gender_choice = (
-        (0, "0"),
-        (1, "1"),
+        (0, "Man"),
+        (1, "Female"),
     )
     gender = models.CharField(max_length=1, choices=gender_choice)
-    age = models.IntegerField()
-    teac_image = models.ImageField(upload_to="teacherImage", blank=True)
+    age = models.DateField()
+    password = models.CharField(max_length=500)
+    user = models.OneToOneField('MyUser', related_name='teacher_user', on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.TeacherID) + str(self.name) + str(self.gender)
@@ -36,8 +42,8 @@ class Course(models.Model):
     classroom_no = models.CharField(max_length=10)
     course_date = models.DateField()
     course_choice = (
-        (0, "0"),
-        (1, "1"),
+        (0, "Cancel"),
+        (1, "Normal"),
     )
     course_state = models.CharField(max_length=1, choices=course_choice)
 
@@ -53,16 +59,16 @@ class Course(models.Model):
 # Create Student model
 class Student(models.Model):
     StudentID = models.CharField(max_length=8)
-    name = models.CharField(max_length=20)
     address = models.TextField()
     stud_email = models.CharField(max_length=100)
     gender_choice = (
-        (0, "0"),
-        (1, "1"),
+        (0, "Man"),
+        (1, "Female"),
     )
     gender = models.CharField(max_length=1, choices=gender_choice)
-    age = models.IntegerField()
-    stud_image = models.ImageField(upload_to="studentImage", blank=True)
+    age = models.DateField()
+    stud_image = models.ImageField(upload_to='studentImage', blank=True)
+    user = models.OneToOneField('MyUser', related_name='student_user',on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.StudentID) + str(self.name) + str(self.gender)

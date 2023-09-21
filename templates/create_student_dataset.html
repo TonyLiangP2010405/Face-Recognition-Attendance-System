@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div>
+        {% csrf_token %}
+        <h1>After click the button, the computer will create the dataset, please see the camera</h1>
+        <input class="btn btn-dark" type="button" id="create_dataset" value="Start">
+    </div>
+    <script>
+        $('#create_dataset').click(function () {
+            $.ajax({
+                url:"create_student_dataset",
+                type:"POST",
+                data:{
+                  "csrfmiddlewaretoken": $("[name = 'csrfmiddlewaretoken']").val()
+                },
+                success: function (data) {
+                    location = 'create_student_dataset/successful';
+                },
+            })
+        })
+    </script>
+{% endblock %}

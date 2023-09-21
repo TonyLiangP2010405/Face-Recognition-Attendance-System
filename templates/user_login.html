@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="wrapper">
+        <div class="logo">
+        </div>
+            <div class="text-center mt-4 name">
+                Login
+            </div>
+            <form class="p-3 mt-3" method="post">
+                {% csrf_token %}
+                <div class="form-field d-flex align-items-center">
+                    <span class="far fa-user"></span>
+                    <input type="text" id="username" name="username" placeholder="username"/>
+                </div>
+                <div class="form-field d-flex align-items-center">
+                    <span class="fas fa-key"></span>
+                    <input type="password" id="password" name="password" placeholder="password"/>
+                </div>
+                <input type="submit" class="btn mt-3" id="login" value="Login">
+            </form>
+        </div>
+{% endblock %}

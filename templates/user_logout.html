@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div>
+    {% csrf_token %}
+        <h1>Are you sure log out</h1>
+        <input type="button" class="btn btn-success" value="logout" id="logout">
+    </div>
+    <script>
+        $('#logout').click(function () {
+            $.ajax({
+                url:"/user_logout/",
+                type:"POST",
+                data:{
+                  "csrfmiddlewaretoken": $("[name = 'csrfmiddlewaretoken']").val()
+                },
+                success: function (data) {
+                    location = '/user_login/';
+                },
+            })
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div>
+    <form novalidate action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3 mt-3">
+            <label for="{{ teac_form.name.id_for_label }}" class="form-label">{{ teac_form.name.label }}</label>
+            <div class="form-field d-flex align-items-center">
+                {{  teac_form.name }}
+                <span class="help-block">{{ teac_form.errors.name.0 }}</span>
+            </div>
+        </div>
+        <div class="mb-3 mt-3">
+            <label for="{{ teac_form.age.id_for_label }}" class="form-label">{{ teac_form.age.label }}</label>
+            <div class="form-field d-flex align-items-center">
+                {{  teac_form.age }}
+                <span class="help-block">{{ teac_form.errors.age.0 }}</span>
+            </div>
+        </div>
+        <div class="mb-3 mt-3">
+            <label for="{{ teac_form.teac_email.id_for_label }}" class="form-label">{{ teac_form.teac_email.label }}</label>
+            <div class="form-field d-flex align-items-center">
+                {{  teac_form.teac_email }}
+                <span class="help-block">{{ teac_form.errors.teac_email.0 }}</span>
+            </div>
+        </div>
+        <div class="mb-3 mt-3">
+            <label for="{{ teac_form.gender.id_for_label }}" class="form-label">{{ teac_form.gender.label }}</label>
+            <div class="form-field d-flex align-items-center">
+                {{  teac_form.gender }}
+                <span class="help-block">{{ teac_form.errors.gender.0 }}</span>
+            </div>
+        </div>
+        <div class="mb-3 mt-3">
+            <label for="{{ teac_form.password.id_for_label }}" class="form-label">{{ teac_form.password.label }}</label>
+            <div class="form-field d-flex align-items-center">
+                {{  teac_form.password }}
+                <span class="help-block">{{ teac_form.errors.password.0 }}</span>
+            </div>
+        </div>
+        <div class="mb-3 mt-3">
+            <label for="{{ teac_form.re_password.id_for_label }}" class="form-label">{{ teac_form.re_password.label }}</label>
+            <div class="form-field d-flex align-items-center">
+                {{  teac_form.re_password }}
+                <span class="help-block">{{ teac_form.errors.re_password.0 }}</span>
+            </div>
+        </div>
+        <div class="col-8">
+            <label for="agreeTerms">
+                {{ error_info }}
+            </label>
+        </div>
+        <div class="col-sm-10">
+              <input type="submit" class="btn btn-success" value="register">
+        </div>
+    </form>
+</div>
+{% endblock %}

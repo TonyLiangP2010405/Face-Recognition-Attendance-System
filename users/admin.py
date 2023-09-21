@@ -1,5 +1,6 @@
 from django.contrib import admin
 from users.models import *
+from django.contrib.auth.admin import UserAdmin
 
 
 # Register your models here.
@@ -35,11 +36,11 @@ class StudentAdmin(admin.ModelAdmin):
     admin.site.index_title = "Face Recognition Attendance Management"
 
     # the attributes of showing in list
-    list_display = ['StudentID', 'name', 'address', 'stud_email', 'gender', 'age']
+    list_display = ['StudentID', 'address', 'stud_email', 'gender', 'age']
     # search
-    search_fields = ['StudentID', 'name']
+    search_fields = ['StudentID']
     # filtration
-    list_filter = ['StudentID', 'name', 'gender', 'age']
+    list_filter = ['StudentID', 'gender', 'age']
     # Set the amount of data displayed per page
     list_per_page = 10
     # Set the sort
@@ -54,11 +55,11 @@ class TeacherAdmin(admin.ModelAdmin):
     admin.site.index_title = "Face Recognition Attendance Management"
 
     # the attributes of showing in list
-    list_display = ['TeacherID', 'name', 'teac_email', 'gender', 'age']
+    list_display = ['TeacherID', 'teac_email', 'gender', 'age']
     # search
-    search_fields = ['TeacherID', 'name']
+    search_fields = ['TeacherID']
     # filtration
-    list_filter = ['TeacherID', 'name']
+    list_filter = ['TeacherID']
     # Set the amount of data displayed per page
     list_per_page = 10
     # Set the sort
@@ -83,3 +84,10 @@ class EnrollmentAdmin(admin.ModelAdmin):
     # Set the sort
     ordering = ['ID']
 
+
+# Register abstract user  model
+admin.site.register(MyUser, UserAdmin)
+
+
+class MyUserAdmin(admin.ModelAdmin):
+    list_display = ['username', 'is_active']
