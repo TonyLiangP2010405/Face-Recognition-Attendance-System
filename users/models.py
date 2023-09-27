@@ -7,6 +7,11 @@ from django.contrib.auth.models import AbstractUser
 # Create AbstractUser model
 class MyUser(AbstractUser):
     ID = models.IntegerField(primary_key=True)
+    user_state_choice = (
+        ("T", "T"),
+        ("S", "S"),
+    )
+    user_state = models.CharField(max_length=1, choices=user_state_choice)
 
 
 # Create Teacher model
@@ -23,7 +28,7 @@ class Teacher(models.Model):
     user = models.OneToOneField('MyUser', related_name='teacher_user', on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.TeacherID) + str(self.name) + str(self.gender)
+        return str(self.TeacherID) + str(self.gender)
 
     class Meta:
         verbose_name = "teacher information"
@@ -35,15 +40,15 @@ class Teacher(models.Model):
 class Course(models.Model):
     CourseID = models.CharField(max_length=20)
     course_name = models.CharField(max_length=100)
-    TeacherID = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    Teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     StartTime = models.TimeField()
     EndTime = models.TimeField()
     ClassID = models.CharField(max_length=20)
     classroom_no = models.CharField(max_length=10)
     course_date = models.DateField()
     course_choice = (
-        (0, "Cancel"),
-        (1, "Normal"),
+        ("0", "Cancel"),
+        ("1", "Normal"),
     )
     course_state = models.CharField(max_length=1, choices=course_choice)
 
@@ -59,6 +64,7 @@ class Course(models.Model):
 # Create Student model
 class Student(models.Model):
     StudentID = models.CharField(max_length=8)
+    stud_name = models.CharField(max_length=100)
     address = models.TextField()
     stud_email = models.CharField(max_length=100)
     gender_choice = (
@@ -71,7 +77,7 @@ class Student(models.Model):
     user = models.OneToOneField('MyUser', related_name='student_user',on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.StudentID) + str(self.name) + str(self.gender)
+        return str(self.StudentID)+ str(self.gender)
 
     class Meta:
         verbose_name = "student information"

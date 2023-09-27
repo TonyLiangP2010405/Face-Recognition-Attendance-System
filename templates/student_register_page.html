@@ -12,6 +12,13 @@
             </div>
         </div>
         <div class="mb-3 mt-3">
+            <label for="{{ stud_form.StudentID.id_for_label }}" class="form-label">{{ stud_form.StudentID.label }}</label>
+            <div class="form-field d-flex align-items-center">
+                {{  stud_form.StudentID }}
+                <span class="help-block">{{ stud_form.errors.StudentID }}</span>
+            </div>
+        </div>
+        <div class="mb-3 mt-3">
             <label for="{{ stud_form.age.id_for_label }}" class="form-label">{{ stud_form.age.label }}</label>
             <div class="form-field d-flex align-items-center">
                 {{  stud_form.age }}

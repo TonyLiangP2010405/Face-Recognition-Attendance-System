@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from users.forms import TeaRegForm, StudRegForm
-from users.models import Teacher, Student, MyUser
+from users.forms import TeaRegForm, StudRegForm, CourseRegForm, UserChangePasswordForm
+from users.models import Teacher, Student, MyUser, Course
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
 import cv2
@@ -207,7 +207,7 @@ def teacher_register(request):
                 return render(request, 'teacher_register_page.html', {'teac_form': teac_form},
                               {'error_info': error_info})
             else:
-                MyUser.objects.create(username=name, password=make_password(password))
+                MyUser.objects.create(username=name, password=make_password(password), user_state="T")
                 user = MyUser.objects.filter(username=name)[0]
                 teac_form.cleaned_data['user'] = user
                 teac_form.cleaned_data['teac_email'] = teac_email
@@ -235,7 +235,8 @@ def student_register(request):
         # check if the form fulfills rules
         if stud_form.is_valid():
             name = request.POST.get("name", '')
-            check_student_exist = Student.objects.filter(user__username=name)
+            StudentID = request.POST.get("StudentID", '')
+            check_student_exist = Student.objects.filter(user__username=StudentID)
             stud_email = request.POST.get("stud_email", '')
             password = request.POST.get("password", '')
             age = request.POST.get("age", '')
@@ -248,7 +249,8 @@ def student_register(request):
                 return render(request, 'student_register_page.html', {'stud_form': stud_form},
                               {'error_info': error_info})
             else:
-                MyUser.objects.create(username=name, password=make_password(password))
+
+                MyUser.objects.create(username=StudentID, password=make_password(password), user_state="S")
                 user = MyUser.objects.filter(username=name)[0]
                 stud_form.cleaned_data['user'] = user
                 stud_form.cleaned_data['stud_email'] = stud_email
@@ -256,10 +258,11 @@ def student_register(request):
                 stud_form.cleaned_data['gender'] = gender
                 stud_form.cleaned_data.pop("re_password")
                 stud_form.cleaned_data['stud_image'] = stud_image
+                stud_form.cleaned_data['StudentID'] = StudentID
                 stud_form.cleaned_data.pop('name')
                 stud_form.cleaned_data.pop('password')
                 Student.objects.create(**stud_form.cleaned_data)
-                stud_login = authenticate(username=name, password=password)
+                stud_login = authenticate(username=StudentID, password=password)
                 login(request, stud_login)
                 return redirect('create_student_dataset')
         else:
@@ -314,7 +317,7 @@ def user_login(request):
             # justify if the user exists
             if len(student) == 0 and len(teacher) == 0:
                 failed_info = "The user doesn't exist"
-                return render(request, "user_login_failed.html", {"failed_info":failed_info})
+                return render(request, "user_login_failed.html", {"failed_info": failed_info})
             else:
                 user_login = authenticate(username=name, password=password)
                 login(request, user_login)
@@ -324,3 +327,196 @@ def user_login(request):
 # user login successful
 def user_login_successful(request):
     return render(request, 'user_login_successful.html')
+
+
+# mark attendance
+# def do_attendance(request):
+#     if request.method =="GET":
+#         attendance_name = mark_your_attendance()
+#         student = Student.objects.filter(user__username=attendance_name)[0]
+
+
+# mark attendance function
+def mark_your_attendance():
+    detector = dlib.get_frontal_face_detector()
+
+    predictor = dlib.shape_predictor(
+        'media/face_recognition_data/shape_predictor_68_face_landmarks.dat')  # Add path to the shape predictor ######CHANGE TO RELATIVE PATH LATER
+    svc_save_path = "media/face_recognition_data/svc.sav"
+
+    with open(svc_save_path, 'rb') as f:
+        svc = pickle.load(f)
+    fa = FaceAligner(predictor, desiredFaceWidth=96)
+    encoder = LabelEncoder()
+    encoder.classes_ = np.load('media/face_recognition_data/classes.npy')
+
+    faces_encodings = np.zeros((1, 128))
+    no_of_faces = len(svc.predict_proba(faces_encodings)[0])
+    count = dict()
+    present = dict()
+    log_time = dict()
+    start = dict()
+    for i in range(no_of_faces):
+        count[encoder.inverse_transform([i])[0]] = 0
+        present[encoder.inverse_transform([i])[0]] = False
+
+    vs = VideoStream(src=0).start()
+
+    sampleNum = 0
+
+    while (True):
+
+        frame = vs.read()
+
+        frame = imutils.resize(frame, width=800)
+
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        faces = detector(gray_frame, 0)
+
+        for face in faces:
+            print("INFO : inside for loop")
+            (x, y, w, h) = face_utils.rect_to_bb(face)
+
+            face_aligned = fa.align(frame, gray_frame, face)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)
+
+            (pred, prob) = predict(face_aligned, svc)
+            print(pred, prob)
+
+            if pred != [-1]:
+
+                person_name = encoder.inverse_transform(np.ravel([pred]))[0]
+                pred = person_name
+                if count[pred] == 0:
+                    start[pred] = time.time()
+                    count[pred] = count.get(pred, 0) + 1
+
+                if count[pred] == 4 and (time.time() - start[pred]) > 1.2:
+                    count[pred] = 0
+                else:
+                    # if count[pred] == 4 and (time.time()-start) <= 1.5:
+                    present[pred] = True
+                    log_time[pred] = datetime.datetime.now()
+                    count[pred] = count.get(pred, 0) + 1
+                    print(pred, present[pred], count[pred])
+                cv2.putText(frame, str(person_name) + str(prob), (x + 6, y + h - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                            (0, 255, 0), 1)
+                return str(person_name)
+
+            else:
+                person_name = "unknown"
+                cv2.putText(frame, str(person_name), (x + 6, y + h - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+
+        # cv2.putText()
+        # Before continuing to the next loop, I want to give it a little pause
+        # waitKey of 100 millisecond
+        # cv2.waitKey(50)
+
+        # Showing the image in another window
+        # Creates a window with window name "Face" and with the image img
+        cv2.imshow("Mark Attendance - In - Press q to exit", frame)
+        # Before closing it we need to give a wait command, otherwise the open cv wont work
+        # @params with the millisecond of delay 1
+        # cv2.waitKey(1)
+        # To get out of the loop
+        key = cv2.waitKey(50) & 0xFF
+        if key == ord("q"):
+            break
+
+    # Stoping the videostream
+    vs.stop()
+
+    # destroying all the windows
+    cv2.destroyAllWindows()
+
+
+# predictor
+def predict(face_aligned, svc, threshold=0.5):
+    face_encodings = np.zeros((1, 128))
+    try:
+        x_face_locations = face_recognition.face_locations(face_aligned)
+        faces_encodings = face_recognition.face_encodings(face_aligned, known_face_locations=x_face_locations)
+        if len(faces_encodings) == 0:
+            return [-1], [0]
+
+    except:
+
+        return ([-1], [0])
+
+    prob = svc.predict_proba(faces_encodings)
+    result = np.where(prob[0] == np.amax(prob[0]))
+    if prob[0][result[0]] <= threshold:
+        return [-1], prob[0][result[0]]
+
+    return result[0], prob[0][result[0]]
+
+
+# create course form
+def AddCourse(request):
+    if request.method == "GET":
+        course_form = CourseRegForm()
+        return render(request, "add_new_course.html", {"course_form": course_form})
+    elif request.method == "POST":
+        course_form = CourseRegForm(request.POST, request.FILES)
+        print(request.POST)
+        if course_form.is_valid():
+            CourseID = request.POST.get("CourseID", '')
+            course_name = request.POST.get("course_name", '')
+            StartTime = request.POST.get("StartTime", '')
+            EndTime = request.POST.get("EndTime", '')
+            ClassID = request.POST.get("ClassID", '')
+            teacher = request.POST.get("teacher_name", '')
+            classroom_no = request.POST.get("classroom_no", '')
+            course_date = request.POST.get("course_date", '')
+            course_state = request.POST.get("course_state", '')
+            course_form.cleaned_data['CourseID'] = CourseID
+            course_form.cleaned_data['course_name'] = course_name
+            course_form.cleaned_data['StartTime'] = StartTime
+            course_form.cleaned_data['EndTime'] = EndTime
+            course_form.cleaned_data['ClassID'] = ClassID
+            course_form.cleaned_data['classroom_no'] = classroom_no
+            course_form.cleaned_data['course_date'] = course_date
+            course_form.cleaned_data['course_state'] = course_state
+            teacher = Teacher.objects.filter(user__username=teacher)
+            if len(teacher) != 0:
+                course_form.cleaned_data['Teacher'] = teacher[0]
+                Course.objects.create(**course_form.cleaned_data)
+                return redirect('create_course_successful')
+            else:
+                errors = "The teacher doesn't exist"
+                return render(request, "add_new_course.html", {"errors": errors})
+        else:
+            errors = course_form.errors
+            print(errors)
+            return render(request, "add_new_course.html", {"course_form": course_form, "errors": errors})
+
+
+# create course successful
+def create_course_successful(request):
+    return render(request, 'create_course_successful.html')
+
+
+# user change password
+def user_change_password(request):
+    if request.method == "GET":
+        user_form = UserChangePasswordForm
+        return render(request, 'user_change_password.html', {"user_form": user_form})
+    elif request.method == "POST":
+        user_form = UserChangePasswordForm(request.POST, request.FILES)
+        username = request.POST.get("username", '')
+        password = request.POST.get("password", '')
+        if user_form.is_valid():
+            user = MyUser.objects.filter(username=username)
+            if len(user) != 0:
+                user[0].password = make_password(password)
+                user[0].save()
+                return redirect('user_change_password_successful')
+            else:
+                errors = "There is a problem in there, you should try again"
+                return render(request, 'user_change_password.html', {"errors": errors})
+
+
+#   user change password successful
+def user_change_password_successful(request):
+    return render(request, "user_change_password_successful.html")

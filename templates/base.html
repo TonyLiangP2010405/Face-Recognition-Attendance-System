@@ -15,6 +15,7 @@
     <a href="{% url 'StudentRegister' %}"><i class="bi"></i>StudentRegister</a>
     <a href="{% url 'TeacherRegister' %}"><i class="bi"></i>TeacherRegister</a>
     <a href="{% url 'HomePage' %}"><i class="bi"></i>Homepage</a>
+    <a href="{% url 'CourseCreate' %}"><i class="bi"></i>CourseCreate</a>
     <ul class="navbar-nav">
         {% if request.user.is_authenticated %}
             <li class="nav-item d-flex align-items-center">

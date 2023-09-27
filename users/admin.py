@@ -14,13 +14,13 @@ class CourseAdmin(admin.ModelAdmin):
     admin.site.index_title = "Face Recognition Attendance Management"
 
     # the attributes of showing in list
-    list_display = ['CourseID', 'course_name', 'TeacherID', 'StartTime', 'EndTime', 'ClassID', 'classroom_no',
+    list_display = ['CourseID', 'course_name', 'Teacher', 'StartTime', 'EndTime', 'ClassID', 'classroom_no',
                     'course_date', 'course_state']
     # search
-    search_fields = ['CourseID', 'course_name', 'TeacherID', 'StartTime', 'EndTime', 'ClassID', 'classroom_no',
+    search_fields = ['CourseID', 'course_name','StartTime', 'EndTime', 'ClassID', 'classroom_no',
                      'course_date', 'course_state']
     # filtration
-    list_filter = ['CourseID', 'TeacherID', 'ClassID']
+    list_filter = ['CourseID', 'ClassID']
 
     # Set the amount of data displayed per page
     list_per_page = 10

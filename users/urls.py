@@ -13,5 +13,10 @@ urlpatterns = [
     path('user_logout/', views.user_logout, name='user_logout'),
     path('user_login/', views.user_login, name='user_login'),
     path('user_login/user_login_successful', views.user_login_successful, name='user_login_successful'),
+    path('CourseCreate/', views.AddCourse, name='CourseCreate'),
+    path('CourseCreate/create_course_successful', views.create_course_successful, name='create_course_successful'),
+    path('user_change_password/', views.user_change_password, name='user_change_password'),
+    path('user_change_password/user_change_password_successful', views.user_change_password_successful,
+         name='user_change_password_successful'),
 
 ]

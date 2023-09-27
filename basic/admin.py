@@ -12,7 +12,7 @@ class AttendanceReportAdmin(admin.ModelAdmin):
     admin.site.index_title = "Face Recognition Attendance Management"
 
     # the attributes of showing in list
-    list_display = ['AttendanceID', 'Present_status', 'Absent_rate', 'Attendance_start_time', 'CourseID']
+    list_display = ['AttendanceID', 'Present_status', 'Attendance_start_time', 'CourseID']
     # search
     search_fields = ['AttendanceID']
     # filtration
